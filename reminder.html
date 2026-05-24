@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reminder App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #0f0f23;
+            color: #e0e0e0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+        .container {
+            width: 100%;
+            max-width: 500px;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 8px;
+            font-size: 2rem;
+            color: #fff;
+        }
+        .subtitle {
+            text-align: center;
+            color: #888;
+            margin-bottom: 30px;
+            font-size: 0.9rem;
+        }
+        .warning-box {
+            background: #2a1a00;
+            border: 1px solid #f59e0b;
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+            color: #fbbf24;
+            line-height: 1.5;
+        }
+        .card {
+            background: #1a1a2e;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            border: 1px solid #2a2a4a;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+            color: #aaa;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        input[type="text"],
+        input[type="datetime-local"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px 14px;
+            background: #0f0f23;
+            border: 1px solid #333;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: #6366f1;
+        }
+        input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        .quick-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+        .quick-btn {
+            background: #0f0f23;
+            border: 1px solid #333;
+            color: #aaa;
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.2s;
+        }
+        .quick-btn:hover {
+            border-color: #6366f1;
+            color: #fff;
+        }
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: #6366f1;
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background: #5558e3;
+        }
+        .btn-secondary {
+            background: #0f0f23;
+            color: #aaa;
+            border: 1px solid #333;
+            padding: 10px;
+            font-size: 0.9rem;
+        }
+        .btn-secondary:hover {
+            border-color: #6366f1;
+            color: #fff;
+        }
+        .btn-danger {
+            background: #ef4444;
+            color: #fff;
+            padding: 8px 14px;
+            font-size: 0.85rem;
+            width: auto;
+        }
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        .btn-snooze {
+            background: #f59e0b;
+            color: #000;
+            padding: 8px 14px;
+            font-size: 0.85rem;
+            width: auto;
+            font-weight: 600;
+        }
+        .btn-snooze:hover {
+            background: #fbbf24;
+        }
+        .reminders-list {
+            margin-top: 10px;
+        }
+        .reminder-item {
+            background: #0f0f23;
+            border: 1px solid #2a2a4a;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 12px;
+            animation: slideIn 0.3s ease;
+        }
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .reminder-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+        .reminder-info {
+            flex: 1;
+        }
+        .reminder-msg {
+            font-weight: 500;
+            color: #fff;
+            margin-bottom: 4px;
+            word-break: break-word;
+        }
+        .reminder-time {
+            font-size: 0.85rem;
+            color: #888;
+        }
+        .reminder-countdown {
+            font-size: 0.9rem;
+            color: #6366f1;
+            font-weight: 600;
+            margin-top: 4px;
+        }
+        .reminder-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            flex-wrap: wrap;
+        }
+        .sound-icon {
+            font-size: 1.2rem;
+            margin-right: 4px;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        .empty-state svg {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+        .notification-perm {
+            background: #1e3a5f;
+            border: 1px solid #3b82f6;
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.9rem;
+        }
+        .notification-perm button {
+            background: #3b82f6;
+            color: #fff;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #1a1a2e;
+            border: 1px solid #6366f1;
+            border-radius: 12px;
+            padding: 16px 20px;
+            max-width: 320px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            animation: toastIn 0.4s ease;
+            z-index: 1000;
+        }
+        @keyframes toastIn {
+            from {
+                transform: translateX(120%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        .toast-title {
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+        .toast-msg {
+            color: #aaa;
+            font-size: 0.9rem;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+        .status-upcoming {
+            background: #1e3a5f;
+            color: #60a5fa;
+        }
+        .status-soon {
+            background: #2a1a00;
+            color: #fbbf24;
+        }
+        .status-now {
+            background: #1a2e1a;
+            color: #4ade80;
+        }
+        .batch-section {
+            border-top: 1px solid #2a2a4a;
+            padding-top: 16px;
+            margin-top: 16px;
+        }
+        .batch-list {
+            margin-top: 12px;
+        }
+        .batch-item {
+            background: #0f0f23;
+            border: 1px solid #333;
+            border-radius: 8px;
+            padding: 10px 14px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+        .batch-item-info {
+            flex: 1;
+        }
+        .batch-item-time {
+            color: #888;
+            font-size: 0.8rem;
+        }
+        .batch-remove {
+            background: none;
+            border: none;
+            color: #ef4444;
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 0 4px;
+        }
+        .snooze-options {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .snooze-btn {
+            background: #1a1a2e;
+            border: 1px solid #444;
+            color: #ccc;
+            padding: 4px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.75rem;
+        }
+        .snooze-btn:hover {
+            border-color: #f59e0b;
+            color: #fbbf24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⏰ Reminder</h1>
+        <p class="subtitle">Pick date & time. Add multiple. Get notified.</p>
+
+        <div class="warning-box">
+            <strong>⚠️ Heads up:</strong> This app runs in your browser. Keep this tab open or pinned for notifications to work. Missed reminders show when you return.
+        </div>
+
+        <div id="permBanner" class="notification-perm" style="display:none;">
+            <span>🔔 Enable browser notifications for alerts even in background.</span>
+            <button onclick="requestNotificationPermission()">Enable</button>
+        </div>
+
+        <div class="card">
+            <div class="form-group">
+                <label for="message">Reminder Message</label>
+                <textarea id="message" placeholder="What should I remind you about?"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="datetime">Date & Time</label>
+                <input type="datetime-local" id="datetime">
+                <div class="quick-buttons">
+                    <button class="quick-btn" onclick="setQuickTime(5)">+5 min</button>
+                    <button class="quick-btn" onclick="setQuickTime(15)">+15 min</button>
+                    <button class="quick-btn" onclick="setQuickTime(30)">+30 min</button>
+                    <button class="quick-btn" onclick="setQuickTime(60)">+1 hour</button>
+                    <button class="quick-btn" onclick="setQuickTime(1440)">+1 day</button>
+                    <button class="quick-btn" onclick="setQuickTime(10080)">+1 week</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="soundChoice">Sound Alert</label>
+                <select id="soundChoice">
+                    <option value="beep">🔔 Standard Beep</option>
+                    <option value="chime">🎵 Gentle Chime</option>
+                    <option value="buzz">📳 Buzz Alert</option>
+                    <option value="ding">✨ Ding Ding</option>
+                    <option value="none">🔇 Silent (no sound)</option>
+                </select>
+            </div>
+
+            <button class="btn btn-secondary" onclick="addToBatch()" style="margin-bottom:10px;">
+                ➕ Add to Batch (set multiple reminders)
+            </button>
+
+            <div id="batchSection" class="batch-section" style="display:none;">
+                <label>Batch Reminders (will all be set together)</label>
+                <div id="batchList" class="batch-list"></div>
+            </div>
+
+            <button class="btn btn-primary" onclick="saveReminders()" style="margin-top:12px;">
+                💾 Save All Reminders
+            </button>
+        </div>
+
+        <div class="card">
+            <h3 style="margin-bottom:16px; font-size:1.1rem;">Active Reminders</h3>
+            <div id="remindersList" class="reminders-list">
+                <div class="empty-state">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                    <p>No reminders set yet</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let reminders = JSON.parse(localStorage.getItem('reminders') || '[]');
+        let batch = [];
+        let audioCtx = null;
+
+        function initDatetimeInput() {
+            const now = new Date();
+            now.setMinutes(now.getMinutes() + 5);
+            now.setSeconds(0, 0);
+            const pad = n => n.toString().padStart(2, '0');
+            const str = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+            document.getElementById('datetime').value = str;
+        }
+        initDatetimeInput();
+
+        function setQuickTime(minutesFromNow) {
+            const now = new Date();
+            now.setMinutes(now.getMinutes() + minutesFromNow);
+            now.setSeconds(0, 0);
+            const pad = n => n.toString().padStart(2, '0');
+            const str = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+            document.getElementById('datetime').value = str;
+        }
+
+        if ('Notification' in window && Notification.permission === 'default') {
+            document.getElementById('permBanner').style.display = 'flex';
+        }
+
+        function requestNotificationPermission() {
+            if (!('Notification' in window)) {
+                alert('This browser does not support notifications');
+                return;
+            }
+            Notification.requestPermission().then(perm => {
+                document.getElementById('permBanner').style.display = 'none';
+                if (perm === 'granted') {
+                    new Notification('Reminders enabled!', {
+                        body: 'You will now get notified when reminders are due.'
+                    });
+                }
+            });
+        }
+
+        function getSoundConfig(type) {
+            const configs = {
+                beep: { freq: 880, type: 'sine', duration: 0.5, vol: 0.3 },
+                chime: { freq: 523, type: 'sine', duration: 0.8, vol: 0.25 },
+                buzz: { freq: 150, type: 'square', duration: 0.4, vol: 0.2 },
+                ding: { freq: 1200, type: 'triangle', duration: 0.3, vol: 0.25 },
+                none: null
+            };
+            return configs[type] || configs.beep;
+        }
+
+        function playSound(soundType) {
+            const config = getSoundConfig(soundType);
+            if (!config) return;
+            try {
+                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.frequency.value = config.freq;
+                osc.type = config.type;
+                gain.gain.setValueAtTime(config.vol, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + config.duration);
+                osc.start(audioCtx.currentTime);
+                osc.stop(audioCtx.currentTime + config.duration);
+            } catch (e) {
+                console.log('Audio not available');
+            }
+        }
+
+        function addToBatch() {
+            const msg = document.getElementById('message').value.trim();
+            const datetimeVal = document.getElementById('datetime').value;
+            const sound = document.getElementById('soundChoice').value;
+
+            if (!msg) {
+                alert('Please enter a reminder message');
+                return;
+            }
+            if (!datetimeVal) {
+                alert('Please pick a date and time');
+                return;
+            }
+
+            const fireAt = new Date(datetimeVal).getTime();
+            const now = Date.now();
+            if (fireAt <= now) {
+                alert('That time is in the past. Pick a future time.');
+                return;
+            }
+
+            batch.push({
+                id: Date.now() + Math.random(),
+                message: msg,
+                fireAt: fireAt,
+                sound: sound,
+                createdAt: now
+            });
+
+            renderBatch();
+            document.getElementById('message').value = '';
+            initDatetimeInput();
+        }
+
+        function removeFromBatch(id) {
+            batch = batch.filter(b => b.id !== id);
+            renderBatch();
+        }
+
+        function renderBatch() {
+            const section = document.getElementById('batchSection');
+            const list = document.getElementById('batchList');
+
+            if (batch.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+
+            section.style.display = 'block';
+            list.innerHTML = batch.map(b => {
+                const fireDate = new Date(b.fireAt);
+                const dateStr = fireDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+                const timeStr = fireDate.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+                const soundLabel = document.querySelector(`#soundChoice option[value="${b.sound}"]`).textContent;
+                return `
+                    <div class="batch-item">
+                        <div class="batch-item-info">
+                            <div>${escapeHtml(b.message)}</div>
+                            <div class="batch-item-time">${dateStr} ${timeStr} · ${soundLabel}</div>
+                        </div>
+                        <button class="batch-remove" onclick="removeFromBatch(${b.id})">×</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function saveReminders() {
+            if (batch.length === 0) {
+                alert('No reminders in batch. Add at least one first.');
+                return;
+            }
+
+            batch.forEach(b => {
+                reminders.push({
+                    id: b.id,
+                    message: b.message,
+                    fireAt: b.fireAt,
+                    sound: b.sound,
+                    createdAt: b.createdAt
+                });
+            });
+
+            batch = [];
+            renderBatch();
+            saveToStorage();
+            renderReminders();
+
+            // Play a confirmation sound
+            playSound('ding');
+        }
+
+        function saveToStorage() {
+            localStorage.setItem('reminders', JSON.stringify(reminders));
+        }
+
+        function removeReminder(id) {
+            reminders = reminders.filter(r => r.id !== id);
+            saveToStorage();
+            renderReminders();
+        }
+
+        function snoozeReminder(id, minutes) {
+            const reminder = reminders.find(r => r.id === id);
+            if (!reminder) return;
+
+            // Remove old, create new snoozed version
+            reminders = reminders.filter(r => r.id !== id);
+            const newFireAt = Date.now() + (minutes * 60 * 1000);
+            reminders.push({
+                id: Date.now(),
+                message: '🔁 ' + reminder.message,
+                fireAt: newFireAt,
+                sound: reminder.sound,
+                createdAt: Date.now()
+            });
+            saveToStorage();
+            renderReminders();
+        }
+
+        function formatTimeLeft(ms) {
+            if (ms <= 0) return 'Firing now...';
+            const seconds = Math.floor(ms / 1000);
+            const mins = Math.floor(seconds / 60);
+            const hrs = Math.floor(mins / 60);
+            const days = Math.floor(hrs / 24);
+
+            if (days > 0) return `${days}d ${hrs % 24}h ${mins % 60}m left`;
+            if (hrs > 0) return `${hrs}h ${mins % 60}m ${seconds % 60}s left`;
+            if (mins > 0) return `${mins}m ${seconds % 60}s left`;
+            return `${seconds}s left`;
+        }
+
+        function getStatusBadge(ms) {
+            const mins = ms / 60000;
+            if (mins <= 1) return '<span class="status-badge status-now">NOW</span>';
+            if (mins <= 10) return '<span class="status-badge status-soon">SOON</span>';
+            return '<span class="status-badge status-upcoming">UPCOMING</span>';
+        }
+
+        function showToast(message, soundType) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.innerHTML = `
+                <div class="toast-title">⏰ Reminder!</div>
+                <div class="toast-msg">${escapeHtml(message)}</div>
+            `;
+            document.body.appendChild(toast);
+            playSound(soundType);
+
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification('Reminder', {
+                    body: message,
+                    requireInteraction: true
+                });
+            }
+
+            setTimeout(() => {
+                toast.style.animation = 'toastIn 0.4s ease reverse';
+                setTimeout(() => toast.remove(), 400);
+            }, 8000);
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function renderReminders() {
+            const list = document.getElementById('remindersList');
+            const now = Date.now();
+
+            reminders.sort((a, b) => a.fireAt - b.fireAt);
+
+            const active = reminders.filter(r => r.fireAt > now);
+            const fired = reminders.filter(r => r.fireAt <= now);
+
+            fired.forEach(r => {
+                showToast(r.message, r.sound);
+            });
+            if (fired.length > 0) {
+                reminders = active;
+                saveToStorage();
+            }
+
+            if (active.length === 0) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polyline points="12 6 12 12 16 14"/>
+                        </svg>
+                        <p>No active reminders</p>
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = active.map(r => {
+                const timeLeft = r.fireAt - now;
+                const fireDate = new Date(r.fireAt);
+                const dateStr = fireDate.toLocaleDateString(undefined, { 
+                    weekday: 'short', month: 'short', day: 'numeric' 
+                });
+                const timeStr = fireDate.toLocaleTimeString(undefined, { 
+                    hour: '2-digit', minute: '2-digit' 
+                });
+                const soundLabel = document.querySelector(`#soundChoice option[value="${r.sound}"]`)?.textContent || '🔔 Beep';
+                return `
+                    <div class="reminder-item">
+                        <div class="reminder-header">
+                            <div class="reminder-info">
+                                <div class="reminder-msg">${escapeHtml(r.message)} ${getStatusBadge(timeLeft)}</div>
+                                <div class="reminder-time">${dateStr} at ${timeStr} · ${soundLabel}</div>
+                                <div class="reminder-countdown" data-fire="${r.fireAt}">${formatTimeLeft(timeLeft)}</div>
+                            </div>
+                        </div>
+                        <div class="reminder-actions">
+                            <div class="snooze-options">
+                                <span style="color:#888; font-size:0.8rem; margin-right:4px;">Snooze:</span>
+                                <button class="snooze-btn" onclick="snoozeReminder(${r.id}, 5)">5m</button>
+                                <button class="snooze-btn" onclick="snoozeReminder(${r.id}, 10)">10m</button>
+                                <button class="snooze-btn" onclick="snoozeReminder(${r.id}, 15)">15m</button>
+                                <button class="snooze-btn" onclick="snoozeReminder(${r.id}, 30)">30m</button>
+                                <button class="snooze-btn" onclick="snoozeReminder(${r.id}, 60)">1h</button>
+                            </div>
+                            <button class="btn btn-danger" onclick="removeReminder(${r.id})">Cancel</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        setInterval(() => {
+            const now = Date.now();
+            document.querySelectorAll('.reminder-countdown').forEach(el => {
+                const fireAt = parseInt(el.dataset.fire);
+                const left = fireAt - now;
+                el.textContent = formatTimeLeft(left);
+            });
+
+            const fired = reminders.filter(r => r.fireAt <= now);
+            if (fired.length > 0) {
+                renderReminders();
+            }
+        }, 1000);
+
+        renderReminders();
+
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden) renderReminders();
+        });
+    </script>
+</body>
+</html>
