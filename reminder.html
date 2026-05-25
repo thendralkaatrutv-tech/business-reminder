@@ -5,11 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Reminder App - Email Notifications</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
             background: #0f0f23;
@@ -20,22 +16,9 @@
             align-items: center;
             padding: 40px 20px;
         }
-        .container {
-            width: 100%;
-            max-width: 500px;
-        }
-        h1 {
-            text-align: center;
-            margin-bottom: 8px;
-            font-size: 2rem;
-            color: #fff;
-        }
-        .subtitle {
-            text-align: center;
-            color: #888;
-            margin-bottom: 30px;
-            font-size: 0.9rem;
-        }
+        .container { width: 100%; max-width: 500px; }
+        h1 { text-align: center; margin-bottom: 8px; font-size: 2rem; color: #fff; }
+        .subtitle { text-align: center; color: #888; margin-bottom: 30px; font-size: 0.9rem; }
         .status-box {
             background: #1a2e1a;
             border: 1px solid #22c55e;
@@ -47,14 +30,8 @@
             line-height: 1.5;
             display: none;
         }
-        .status-box.error {
-            background: #2a1a1a;
-            border-color: #ef4444;
-            color: #f87171;
-        }
-        .status-box.show {
-            display: block;
-        }
+        .status-box.error { background: #2a1a1a; border-color: #ef4444; color: #f87171; }
+        .status-box.show { display: block; }
         .card {
             background: #1a1a2e;
             border-radius: 16px;
@@ -62,9 +39,7 @@
             margin-bottom: 20px;
             border: 1px solid #2a2a4a;
         }
-        .form-group {
-            margin-bottom: 16px;
-        }
+        .form-group { margin-bottom: 16px; }
         label {
             display: block;
             margin-bottom: 6px;
@@ -87,24 +62,10 @@
             transition: border-color 0.2s;
             font-family: inherit;
         }
-        input:focus,
-        textarea:focus {
-            border-color: #6366f1;
-        }
-        input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
-            cursor: pointer;
-        }
-        textarea {
-            resize: vertical;
-            min-height: 80px;
-        }
-        .quick-buttons {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-bottom: 12px;
-        }
+        input:focus, textarea:focus { border-color: #6366f1; }
+        input[type="datetime-local"]::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
+        textarea { resize: vertical; min-height: 80px; }
+        .quick-buttons { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
         .quick-btn {
             background: #0f0f23;
             border: 1px solid #333;
@@ -115,10 +76,7 @@
             font-size: 0.8rem;
             transition: all 0.2s;
         }
-        .quick-btn:hover {
-            border-color: #6366f1;
-            color: #fff;
-        }
+        .quick-btn:hover { border-color: #6366f1; color: #fff; }
         .btn {
             width: 100%;
             padding: 14px;
@@ -129,31 +87,19 @@
             cursor: pointer;
             transition: all 0.2s;
         }
-        .btn-primary {
-            background: #6366f1;
-            color: #fff;
+        .btn-primary { background: #6366f1; color: #fff; }
+        .btn-primary:hover { background: #5558e3; }
+        .btn-primary:disabled { background: #333; color: #666; cursor: not-allowed; }
+        .btn-secondary {
+            background: #0f0f23;
+            border: 1px solid #6366f1;
+            color: #6366f1;
+            margin-top: 8px;
         }
-        .btn-primary:hover {
-            background: #5558e3;
-        }
-        .btn-primary:disabled {
-            background: #333;
-            color: #666;
-            cursor: not-allowed;
-        }
-        .btn-danger {
-            background: #ef4444;
-            color: #fff;
-            padding: 8px 14px;
-            font-size: 0.85rem;
-            width: auto;
-        }
-        .btn-danger:hover {
-            background: #dc2626;
-        }
-        .reminders-list {
-            margin-top: 10px;
-        }
+        .btn-secondary:hover { background: #6366f1; color: #fff; }
+        .btn-danger { background: #ef4444; color: #fff; padding: 8px 14px; font-size: 0.85rem; width: auto; }
+        .btn-danger:hover { background: #dc2626; }
+        .reminders-list { margin-top: 10px; }
         .reminder-item {
             background: #0f0f23;
             border: 1px solid #2a2a4a;
@@ -166,45 +112,15 @@
             animation: slideIn 0.3s ease;
         }
         @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .reminder-info {
-            flex: 1;
-        }
-        .reminder-msg {
-            font-weight: 500;
-            color: #fff;
-            margin-bottom: 4px;
-            word-break: break-word;
-        }
-        .reminder-time {
-            font-size: 0.85rem;
-            color: #888;
-        }
-        .reminder-countdown {
-            font-size: 0.9rem;
-            color: #6366f1;
-            font-weight: 600;
-            margin-top: 4px;
-        }
-        .empty-state {
-            text-align: center;
-            padding: 40px;
-            color: #666;
-        }
-        .empty-state svg {
-            width: 48px;
-            height: 48px;
-            margin-bottom: 12px;
-            opacity: 0.5;
-        }
+        .reminder-info { flex: 1; }
+        .reminder-msg { font-weight: 500; color: #fff; margin-bottom: 4px; word-break: break-word; }
+        .reminder-time { font-size: 0.85rem; color: #888; }
+        .reminder-countdown { font-size: 0.9rem; color: #6366f1; font-weight: 600; margin-top: 4px; }
+        .empty-state { text-align: center; padding: 40px; color: #666; }
+        .empty-state svg { width: 48px; height: 48px; margin-bottom: 12px; opacity: 0.5; }
         .notification-perm {
             background: #1e3a5f;
             border: 1px solid #3b82f6;
@@ -225,6 +141,44 @@
             cursor: pointer;
             font-size: 0.85rem;
         }
+
+        /* TAB OPEN WARNING BANNER */
+        .tab-warning {
+            background: #2a1f00;
+            border: 1px solid #f59e0b;
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+            color: #fbbf24;
+            line-height: 1.6;
+            display: none;
+        }
+        .tab-warning.show { display: block; }
+        .tab-warning strong { color: #fde68a; }
+
+        /* SCHEDULED EMAIL BADGE */
+        .scheduled-badge {
+            display: inline-block;
+            background: #1e3a5f;
+            color: #60a5fa;
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-left: 6px;
+        }
+        .sent-badge {
+            display: inline-block;
+            background: #1a2e1a;
+            color: #4ade80;
+            font-size: 0.72rem;
+            font-weight: 600;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-left: 6px;
+        }
+
         .toast {
             position: fixed;
             top: 20px;
@@ -239,24 +193,11 @@
             z-index: 1000;
         }
         @keyframes toastIn {
-            from {
-                transform: translateX(120%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
+            from { transform: translateX(120%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
-        .toast-title {
-            font-weight: 600;
-            color: #fff;
-            margin-bottom: 4px;
-        }
-        .toast-msg {
-            color: #aaa;
-            font-size: 0.9rem;
-        }
+        .toast-title { font-weight: 600; color: #fff; margin-bottom: 4px; }
+        .toast-msg { color: #aaa; font-size: 0.9rem; }
         .sound-toggle {
             display: flex;
             align-items: center;
@@ -265,9 +206,7 @@
             font-size: 0.9rem;
             color: #888;
         }
-        .sound-toggle input {
-            width: auto;
-        }
+        .sound-toggle input { width: auto; }
         .status-badge {
             display: inline-block;
             padding: 2px 8px;
@@ -276,18 +215,9 @@
             font-weight: 600;
             margin-left: 8px;
         }
-        .status-upcoming {
-            background: #1e3a5f;
-            color: #60a5fa;
-        }
-        .status-soon {
-            background: #2a1a00;
-            color: #fbbf24;
-        }
-        .status-now {
-            background: #1a2e1a;
-            color: #4ade80;
-        }
+        .status-upcoming { background: #1e3a5f; color: #60a5fa; }
+        .status-soon { background: #2a1a00; color: #fbbf24; }
+        .status-now { background: #1a2e1a; color: #4ade80; }
         .email-info {
             display: flex;
             align-items: center;
@@ -300,344 +230,413 @@
             font-size: 0.85rem;
             color: #888;
         }
-        .email-info .icon {
-            font-size: 1.1rem;
+        .email-info .icon { font-size: 1.1rem; }
+        .how-it-works {
+            background: #12122a;
+            border: 1px solid #2a2a4a;
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            font-size: 0.82rem;
+            color: #777;
+            line-height: 1.7;
         }
+        .how-it-works strong { color: #aaa; }
     </style>
-<base target="_blank">
+    <base target="_blank">
 </head>
 <body>
-    <div class="container">
-        <h1>⏰ Reminder</h1>
-        <p class="subtitle">Set a reminder. Get an email + browser alert instantly.</p>
+<div class="container">
+    <h1>⏰ Reminder</h1>
+    <p class="subtitle">Set a reminder — email is sent exactly at the scheduled time.</p>
 
-        <div id="statusBox" class="status-box"></div>
+    <div id="statusBox" class="status-box"></div>
 
-        <div class="email-info">
-            <span class="icon">📧</span>
-            <span>Emails will be sent to: <strong>thendralkaatrutv@gmail.com</strong></span>
+    <!-- Tab must stay open warning — shown once a reminder is set -->
+    <div id="tabWarning" class="tab-warning">
+        ⚠️ <strong>Keep this tab open!</strong> The email will be sent at the scheduled time as long as this tab stays open in your browser. You can minimize the window — just don't close this tab.
+    </div>
+
+    <div class="how-it-works">
+        <strong>How it works:</strong> When you set a reminder, no email is sent right away. The app waits silently until the exact scheduled time, then sends the email automatically. <strong>Keep this tab open</strong> until all your reminders fire.
+    </div>
+
+    <div class="email-info">
+        <span class="icon">📧</span>
+        <span>Emails will be sent to: <strong>thendralkaatrutv@gmail.com</strong></span>
+    </div>
+
+    <div id="permBanner" class="notification-perm" style="display:none;">
+        <span>🔔 Enable browser notifications for alerts when tab is open.</span>
+        <button onclick="requestNotificationPermission()">Enable</button>
+    </div>
+
+    <div class="card">
+        <div class="form-group">
+            <label for="message">Reminder Message</label>
+            <textarea id="message" placeholder="What should I remind you about?"></textarea>
         </div>
-
-        <div id="permBanner" class="notification-perm" style="display:none;">
-            <span>🔔 Enable browser notifications for alerts when tab is open.</span>
-            <button onclick="requestNotificationPermission()">Enable</button>
+        <div class="form-group">
+            <label for="datetime">Date & Time</label>
+            <input type="datetime-local" id="datetime">
+            <div class="quick-buttons" style="margin-top:10px;">
+                <button class="quick-btn" onclick="setQuickTime(5)">+5 min</button>
+                <button class="quick-btn" onclick="setQuickTime(15)">+15 min</button>
+                <button class="quick-btn" onclick="setQuickTime(30)">+30 min</button>
+                <button class="quick-btn" onclick="setQuickTime(60)">+1 hour</button>
+                <button class="quick-btn" onclick="setQuickTime(1440)">+1 day</button>
+                <button class="quick-btn" onclick="setQuickTime(10080)">+1 week</button>
+            </div>
         </div>
-
-        <div class="card">
-            <div class="form-group">
-                <label for="message">Reminder Message</label>
-                <textarea id="message" placeholder="What should I remind you about?"></textarea>
-            </div>
-
-            <div class="form-group">
-                <label for="datetime">Date & Time</label>
-                <input type="datetime-local" id="datetime">
-                <div class="quick-buttons">
-                    <button class="quick-btn" onclick="setQuickTime(5)">+5 min</button>
-                    <button class="quick-btn" onclick="setQuickTime(15)">+15 min</button>
-                    <button class="quick-btn" onclick="setQuickTime(30)">+30 min</button>
-                    <button class="quick-btn" onclick="setQuickTime(60)">+1 hour</button>
-                    <button class="quick-btn" onclick="setQuickTime(1440)">+1 day</button>
-                    <button class="quick-btn" onclick="setQuickTime(10080)">+1 week</button>
-                </div>
-            </div>
-
-            <div class="sound-toggle">
-                <input type="checkbox" id="playSound" checked>
-                <label for="playSound" style="margin:0; text-transform:none; letter-spacing:0; font-size:0.9rem; color:#888;">Play sound when reminder fires</label>
-            </div>
-
-            <button class="btn btn-primary" id="setBtn" onclick="addReminder()" style="margin-top:16px;">
-                Set Reminder & Send Email
-            </button>
+        <div class="sound-toggle">
+            <input type="checkbox" id="playSound" checked>
+            <label for="playSound" style="margin:0; text-transform:none; letter-spacing:0; font-size:0.9rem; color:#888;">Play sound when reminder fires</label>
         </div>
+        <button class="btn btn-primary" id="setBtn" onclick="addReminder()" style="margin-top:16px;">
+            ⏳ Schedule Reminder
+        </button>
+        <button class="btn btn-secondary" onclick="testEmail()">
+            Send Test Email Now
+        </button>
+    </div>
 
-        <div class="card">
-            <h3 style="margin-bottom:16px; font-size:1.1rem;">Active Reminders</h3>
-            <div id="remindersList" class="reminders-list">
+    <div class="card">
+        <h3 style="margin-bottom:16px; font-size:1.1rem;">Active Reminders</h3>
+        <div id="remindersList" class="reminders-list">
+            <div class="empty-state">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <polyline points="12 6 12 12 16 14"/>
+                </svg>
+                <p>No reminders set yet</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const EMAILJS_SERVICE_ID  = "service_c9jt6u2";
+    const EMAILJS_TEMPLATE_ID = "template_oj9tijw";
+    const EMAILJS_PUBLIC_KEY  = "k-E8VQ9h5SiZ4VJUO";
+    const USER_EMAIL          = "thendralkaatrutv@gmail.com";
+
+    // reminders stored in memory + localStorage
+    // scheduledTimeouts keeps the live setTimeout handles so we can cancel
+    let reminders = JSON.parse(localStorage.getItem('reminders') || '[]');
+    let scheduledTimeouts = {}; // id -> timeoutHandle
+    let audioCtx = null;
+
+    // ── Notification permission ───────────────────────────────────
+    if ('Notification' in window && Notification.permission === 'default') {
+        document.getElementById('permBanner').style.display = 'flex';
+    }
+    function requestNotificationPermission() {
+        Notification.requestPermission().then(p => {
+            document.getElementById('permBanner').style.display = 'none';
+            if (p === 'granted') new Notification('Reminders enabled!', { body: 'You will get browser alerts when reminders fire.' });
+        });
+    }
+
+    // ── Datetime helpers ─────────────────────────────────────────
+    function pad(n) { return n.toString().padStart(2, '0'); }
+    function initDatetimeInput() {
+        const now = new Date();
+        now.setMinutes(now.getMinutes() + 5);
+        now.setSeconds(0, 0);
+        document.getElementById('datetime').value =
+            `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+    }
+    function setQuickTime(mins) {
+        const now = new Date();
+        now.setMinutes(now.getMinutes() + mins);
+        now.setSeconds(0, 0);
+        document.getElementById('datetime').value =
+            `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
+    }
+    initDatetimeInput();
+
+    // ── Status bar ───────────────────────────────────────────────
+    function showStatus(msg, isError) {
+        const box = document.getElementById('statusBox');
+        box.textContent = msg;
+        box.className = 'status-box show' + (isError ? ' error' : '');
+        setTimeout(() => box.classList.remove('show'), 8000);
+    }
+
+    // ── Sound ────────────────────────────────────────────────────
+    function playBeep() {
+        if (!document.getElementById('playSound').checked) return;
+        try {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.value = 880;
+            osc.type = 'sine';
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.8);
+            osc.start(audioCtx.currentTime);
+            osc.stop(audioCtx.currentTime + 0.8);
+        } catch(e) {}
+    }
+
+    // ── Core: send email via EmailJS REST API ────────────────────
+    async function sendEmail(message, fireAt) {
+        const fireDate = new Date(fireAt);
+        const dateStr  = fireDate.toLocaleDateString(undefined, { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+        const timeStr  = fireDate.toLocaleTimeString(undefined, { hour:'2-digit', minute:'2-digit' });
+        try {
+            const res = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    service_id:  EMAILJS_SERVICE_ID,
+                    template_id: EMAILJS_TEMPLATE_ID,
+                    user_id:     EMAILJS_PUBLIC_KEY,
+                    template_params: {
+                        email:      USER_EMAIL,
+                        message:    message,
+                        datetime:   dateStr + " at " + timeStr,
+                        created_at: new Date().toLocaleString()
+                    }
+                })
+            });
+            if (!res.ok) {
+                const txt = await res.text();
+                console.error("EmailJS REST error:", res.status, txt);
+                return false;
+            }
+            return true;
+        } catch(e) {
+            console.error("EmailJS send failed", e);
+            return false;
+        }
+    }
+
+    // ── Schedule a reminder's email via setTimeout ───────────────
+    function scheduleEmailTimeout(reminder) {
+        const delay = reminder.fireAt - Date.now();
+        if (delay <= 0) return; // already past — handled by renderReminders
+
+        const handle = setTimeout(async () => {
+            // Fire the in-page alert
+            showToast(reminder.message);
+            playBeep();
+
+            // Send the email at the EXACT scheduled time
+            const ok = await sendEmail(reminder.message, reminder.fireAt);
+            showStatus(
+                ok ? "✅ Email sent for: " + reminder.message
+                   : "⚠️ Email send failed. Check EmailJS dashboard.",
+                !ok
+            );
+
+            // Mark as sent & re-render
+            const r = reminders.find(x => x.id === reminder.id);
+            if (r) r.emailSent = true;
+            saveReminders();
+            renderReminders();
+        }, delay);
+
+        scheduledTimeouts[reminder.id] = handle;
+    }
+
+    // ── Add reminder ─────────────────────────────────────────────
+    function addReminder() {
+        const msg         = document.getElementById('message').value.trim();
+        const datetimeVal = document.getElementById('datetime').value;
+
+        if (!msg)          { showStatus("Please enter a reminder message", true); return; }
+        if (!datetimeVal)  { showStatus("Please pick a date and time", true); return; }
+
+        const fireAt = new Date(datetimeVal).getTime();
+        if (fireAt <= Date.now()) { showStatus("That time is in the past. Pick a future time.", true); return; }
+
+        const reminder = {
+            id:        Date.now(),
+            message:   msg,
+            fireAt:    fireAt,
+            createdAt: Date.now(),
+            emailSent: false
+        };
+
+        reminders.push(reminder);
+        saveReminders();
+
+        // Schedule the email to fire at the right time
+        scheduleEmailTimeout(reminder);
+
+        // Show the "keep tab open" warning
+        document.getElementById('tabWarning').classList.add('show');
+
+        const fireDate = new Date(fireAt);
+        const dateStr  = fireDate.toLocaleDateString(undefined, { weekday:'short', month:'short', day:'numeric' });
+        const timeStr  = fireDate.toLocaleTimeString(undefined, { hour:'2-digit', minute:'2-digit' });
+        showStatus(`⏳ Reminder scheduled! Email will be sent on ${dateStr} at ${timeStr}. Keep this tab open.`);
+
+        document.getElementById('message').value = '';
+        initDatetimeInput();
+        renderReminders();
+    }
+
+    // ── Remove reminder ───────────────────────────────────────────
+    function removeReminder(id) {
+        // Cancel the scheduled email
+        if (scheduledTimeouts[id]) {
+            clearTimeout(scheduledTimeouts[id]);
+            delete scheduledTimeouts[id];
+        }
+        reminders = reminders.filter(r => r.id !== id);
+        saveReminders();
+        renderReminders();
+
+        // Hide warning banner if no more reminders
+        if (reminders.filter(r => r.fireAt > Date.now()).length === 0) {
+            document.getElementById('tabWarning').classList.remove('show');
+        }
+    }
+
+    // ── Persist ───────────────────────────────────────────────────
+    function saveReminders() {
+        localStorage.setItem('reminders', JSON.stringify(reminders));
+    }
+
+    // ── Test email ────────────────────────────────────────────────
+    async function testEmail() {
+        showStatus("Sending test email right now...");
+        const ok = await sendEmail("TEST - This is a test email from your Reminder App", Date.now());
+        showStatus(ok ? "✅ Test email sent! Check your inbox." : "❌ Test email failed.", !ok);
+    }
+
+    // ── Format helpers ────────────────────────────────────────────
+    function formatTimeLeft(ms) {
+        if (ms <= 0) return 'Sending email...';
+        const s = Math.floor(ms / 1000);
+        const m = Math.floor(s / 60);
+        const h = Math.floor(m / 60);
+        const d = Math.floor(h / 24);
+        if (d > 0) return `${d}d ${h%24}h ${m%60}m left`;
+        if (h > 0) return `${h}h ${m%60}m ${s%60}s left`;
+        if (m > 0) return `${m}m ${s%60}s left`;
+        return `${s}s left`;
+    }
+    function getStatusBadge(ms) {
+        const mins = ms / 60000;
+        if (mins <= 1)  return '<span class="status-badge status-now">NOW</span>';
+        if (mins <= 10) return '<span class="status-badge status-soon">SOON</span>';
+        return '<span class="status-badge status-upcoming">UPCOMING</span>';
+    }
+    function escapeHtml(text) {
+        const d = document.createElement('div');
+        d.textContent = text;
+        return d.innerHTML;
+    }
+
+    // ── Toast popup ───────────────────────────────────────────────
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.innerHTML = `<div class="toast-title">⏰ Reminder!</div><div class="toast-msg">${escapeHtml(message)}</div>`;
+        document.body.appendChild(toast);
+        if ('Notification' in window && Notification.permission === 'granted') {
+            new Notification('Reminder', { body: message, requireInteraction: true });
+        }
+        setTimeout(() => {
+            toast.style.animation = 'toastIn 0.4s ease reverse';
+            setTimeout(() => toast.remove(), 400);
+        }, 10000);
+    }
+
+    // ── Render list ───────────────────────────────────────────────
+    function renderReminders() {
+        const list = document.getElementById('remindersList');
+        const now  = Date.now();
+        reminders.sort((a, b) => a.fireAt - b.fireAt);
+
+        // Remove reminders that fired AND email was sent
+        const stale = reminders.filter(r => r.fireAt <= now && r.emailSent);
+        if (stale.length) {
+            reminders = reminders.filter(r => !(r.fireAt <= now && r.emailSent));
+            saveReminders();
+        }
+
+        const active = reminders.filter(r => r.fireAt > now || !r.emailSent);
+
+        if (active.length === 0) {
+            list.innerHTML = `
                 <div class="empty-state">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <circle cx="12" cy="12" r="10"/>
                         <polyline points="12 6 12 12 16 14"/>
                     </svg>
-                    <p>No reminders set yet</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- EmailJS SDK -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-
-    <script>
-        // EmailJS config
-        const EMAILJS_SERVICE_ID = "service_c9jt6u2";
-        const EMAILJS_TEMPLATE_ID = "37c1oxa";
-        const EMAILJS_PUBLIC_KEY = "k-E8VQ9h5SiZ4VJUO";
-        const USER_EMAIL = "thendralkaatrutv@gmail.com";
-
-        // Initialize EmailJS
-        emailjs.init(EMAILJS_PUBLIC_KEY);
-
-        let reminders = JSON.parse(localStorage.getItem('reminders') || '[]');
-        let audioCtx = null;
-
-        // Check notification permission on load
-        if ('Notification' in window && Notification.permission === 'default') {
-            document.getElementById('permBanner').style.display = 'flex';
+                    <p>No active reminders</p>
+                </div>`;
+            document.getElementById('tabWarning').classList.remove('show');
+            return;
         }
 
-        function requestNotificationPermission() {
-            if (!('Notification' in window)) {
-                showStatus("This browser does not support notifications", true);
-                return;
-            }
-            Notification.requestPermission().then(perm => {
-                document.getElementById('permBanner').style.display = 'none';
-                if (perm === 'granted') {
-                    new Notification('Reminders enabled!', {
-                        body: 'You will now get browser notifications when reminders are due.'
-                    });
-                }
-            });
-        }
-
-        function playBeep() {
-            if (!document.getElementById('playSound').checked) return;
-            try {
-                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.frequency.value = 880;
-                osc.type = 'sine';
-                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
-                osc.start(audioCtx.currentTime);
-                osc.stop(audioCtx.currentTime + 0.5);
-            } catch (e) {}
-        }
-
-        function initDatetimeInput() {
-            const now = new Date();
-            now.setMinutes(now.getMinutes() + 5);
-            now.setSeconds(0, 0);
-            const pad = n => n.toString().padStart(2, '0');
-            const str = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
-            document.getElementById('datetime').value = str;
-        }
-        initDatetimeInput();
-
-        function setQuickTime(minutesFromNow) {
-            const now = new Date();
-            now.setMinutes(now.getMinutes() + minutesFromNow);
-            now.setSeconds(0, 0);
-            const pad = n => n.toString().padStart(2, '0');
-            const str = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}T${pad(now.getHours())}:${pad(now.getMinutes())}`;
-            document.getElementById('datetime').value = str;
-        }
-
-        function showStatus(msg, isError) {
-            const box = document.getElementById('statusBox');
-            box.textContent = msg;
-            box.className = 'status-box show' + (isError ? ' error' : '');
-            setTimeout(() => box.classList.remove('show'), 5000);
-        }
-
-        async function addReminder() {
-            const msg = document.getElementById('message').value.trim();
-            const datetimeVal = document.getElementById('datetime').value;
-
-            if (!msg) {
-                showStatus("Please enter a reminder message", true);
-                return;
-            }
-            if (!datetimeVal) {
-                showStatus("Please pick a date and time", true);
-                return;
-            }
-
-            const fireAt = new Date(datetimeVal).getTime();
-            const now = Date.now();
-
-            if (fireAt <= now) {
-                showStatus("That time is in the past. Pick a future time.", true);
-                return;
-            }
-
-            const btn = document.getElementById('setBtn');
-            btn.disabled = true;
-            btn.textContent = "Sending email...";
-
-            // Send email via EmailJS
-            try {
-                const fireDate = new Date(fireAt);
-                const dateStr = fireDate.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-                const timeStr = fireDate.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
-                const createdStr = new Date().toLocaleString();
-
-                await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-                    email: USER_EMAIL,
-                    message: msg,
-                    datetime: dateStr + " at " + timeStr,
-                    created_at: createdStr
-                });
-
-                showStatus("Email sent! Check your inbox.");
-            } catch (e) {
-                showStatus("Email failed: " + (e.text || e.message), true);
-                console.error("EmailJS error:", e);
-                btn.disabled = false;
-                btn.textContent = "Set Reminder & Send Email";
-                return;
-            }
-
-            // Save reminder locally
-            const reminder = {
-                id: Date.now(),
-                message: msg,
-                fireAt: fireAt,
-                createdAt: now,
-                emailed: true
-            };
-
-            reminders.push(reminder);
-            saveReminders();
-            renderReminders();
-
-            // Clear form
-            document.getElementById('message').value = '';
-            initDatetimeInput();
-
-            btn.disabled = false;
-            btn.textContent = "Set Reminder & Send Email";
-        }
-
-        function removeReminder(id) {
-            reminders = reminders.filter(r => r.id !== id);
-            saveReminders();
-            renderReminders();
-        }
-
-        function saveReminders() {
-            localStorage.setItem('reminders', JSON.stringify(reminders));
-        }
-
-        function formatTimeLeft(ms) {
-            if (ms <= 0) return 'Firing now...';
-            const seconds = Math.floor(ms / 1000);
-            const mins = Math.floor(seconds / 60);
-            const hrs = Math.floor(mins / 60);
-            const days = Math.floor(hrs / 24);
-            if (days > 0) return `${days}d ${hrs % 24}h ${mins % 60}m left`;
-            if (hrs > 0) return `${hrs}h ${mins % 60}m ${seconds % 60}s left`;
-            if (mins > 0) return `${mins}m ${seconds % 60}s left`;
-            return `${seconds}s left`;
-        }
-
-        function getStatusBadge(ms) {
-            const mins = ms / 60000;
-            if (mins <= 1) return '<span class="status-badge status-now">NOW</span>';
-            if (mins <= 10) return '<span class="status-badge status-soon">SOON</span>';
-            return '<span class="status-badge status-upcoming">UPCOMING</span>';
-        }
-
-        function showToast(message) {
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.innerHTML = `
-                <div class="toast-title">⏰ Reminder!</div>
-                <div class="toast-msg">${escapeHtml(message)}</div>
-            `;
-            document.body.appendChild(toast);
-            playBeep();
-
-            if ('Notification' in window && Notification.permission === 'granted') {
-                new Notification('Reminder', {
-                    body: message,
-                    requireInteraction: true
-                });
-            }
-
-            setTimeout(() => {
-                toast.style.animation = 'toastIn 0.4s ease reverse';
-                setTimeout(() => toast.remove(), 400);
-            }, 8000);
-        }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-
-        function renderReminders() {
-            const list = document.getElementById('remindersList');
-            const now = Date.now();
-            reminders.sort((a, b) => a.fireAt - b.fireAt);
-            const active = reminders.filter(r => r.fireAt > now);
-            const fired = reminders.filter(r => r.fireAt <= now);
-
-            fired.forEach(r => {
-                showToast(r.message);
-            });
-            if (fired.length > 0) {
-                reminders = active;
-                saveReminders();
-            }
-
-            if (active.length === 0) {
-                list.innerHTML = `
-                    <div class="empty-state">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"/>
-                            <polyline points="12 6 12 12 16 14"/>
-                        </svg>
-                        <p>No active reminders</p>
+        list.innerHTML = active.map(r => {
+            const timeLeft = r.fireAt - now;
+            const fireDate = new Date(r.fireAt);
+            const dateStr  = fireDate.toLocaleDateString(undefined, { weekday:'short', month:'short', day:'numeric' });
+            const timeStr  = fireDate.toLocaleTimeString(undefined, { hour:'2-digit', minute:'2-digit' });
+            const badge    = r.emailSent
+                ? '<span class="sent-badge">✓ Email Sent</span>'
+                : '<span class="scheduled-badge">📅 Email Scheduled</span>';
+            return `
+                <div class="reminder-item">
+                    <div class="reminder-info">
+                        <div class="reminder-msg">${escapeHtml(r.message)} ${getStatusBadge(timeLeft)}</div>
+                        <div class="reminder-time">${dateStr} at ${timeStr} ${badge}</div>
+                        <div class="reminder-countdown" data-fire="${r.fireAt}">${formatTimeLeft(timeLeft)}</div>
                     </div>
-                `;
-                return;
+                    <button class="btn btn-danger" onclick="removeReminder(${r.id})">Cancel</button>
+                </div>`;
+        }).join('');
+    }
+
+    // ── Reschedule any existing reminders on page load ────────────
+    // (in case user refreshed the page before the reminder fired)
+    function restoreScheduledTimeouts() {
+        const now = Date.now();
+        reminders.forEach(r => {
+            if (r.fireAt > now && !r.emailSent) {
+                scheduleEmailTimeout(r);
             }
-
-            list.innerHTML = active.map(r => {
-                const timeLeft = r.fireAt - now;
-                const fireDate = new Date(r.fireAt);
-                const dateStr = fireDate.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
-                const timeStr = fireDate.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
-                const emailBadge = r.emailed ? '<span style="color:#4ade80; font-size:0.75rem;">✓ Emailed</span>' : '';
-                return `
-                    <div class="reminder-item">
-                        <div class="reminder-info">
-                            <div class="reminder-msg">${escapeHtml(r.message)} ${getStatusBadge(timeLeft)}</div>
-                            <div class="reminder-time">${dateStr} at ${timeStr} ${emailBadge}</div>
-                            <div class="reminder-countdown" data-fire="${r.fireAt}">${formatTimeLeft(timeLeft)}</div>
-                        </div>
-                        <button class="btn btn-danger" onclick="removeReminder(${r.id})">Cancel</button>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        setInterval(() => {
-            const now = Date.now();
-            document.querySelectorAll('.reminder-countdown').forEach(el => {
-                const fireAt = parseInt(el.dataset.fire);
-                const left = fireAt - now;
-                el.textContent = formatTimeLeft(left);
-            });
-
-            const fired = reminders.filter(r => r.fireAt <= now);
-            if (fired.length > 0) {
-                renderReminders();
-            }
-        }, 1000);
-
-        document.addEventListener('visibilitychange', () => {
-            if (!document.hidden) renderReminders();
         });
+        if (reminders.some(r => r.fireAt > now)) {
+            document.getElementById('tabWarning').classList.add('show');
+        }
+    }
 
-        renderReminders();
-    </script>
+    // ── Countdown ticker ──────────────────────────────────────────
+    setInterval(() => {
+        const now = Date.now();
+        document.querySelectorAll('.reminder-countdown').forEach(el => {
+            const fireAt = parseInt(el.dataset.fire);
+            el.textContent = formatTimeLeft(fireAt - now);
+        });
+    }, 1000);
+
+    // ── Warn before closing tab ───────────────────────────────────
+    window.addEventListener('beforeunload', e => {
+        const hasActive = reminders.some(r => r.fireAt > Date.now() && !r.emailSent);
+        if (hasActive) {
+            e.preventDefault();
+            e.returnValue = 'You have pending reminders. Closing this tab will cancel scheduled emails!';
+            return e.returnValue;
+        }
+    });
+
+    // ── Visibility change: re-render when tab comes back ─────────
+    document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) renderReminders();
+    });
+
+    // ── Boot ──────────────────────────────────────────────────────
+    restoreScheduledTimeouts();
+    renderReminders();
+</script>
 </body>
 </html>
