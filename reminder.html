@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reminder App - Email Notifications</title>
+    <title>Reminder App</title>
     <style>
         * {
             margin: 0;
@@ -55,6 +55,23 @@
         .status-box.show {
             display: block;
         }
+        .tab-warning {
+            background: #2a1f00;
+            border: 1px solid #f59e0b;
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 20px;
+            font-size: 0.85rem;
+            color: #fbbf24;
+            line-height: 1.6;
+            display: none;
+        }
+        .tab-warning.show {
+            display: block;
+        }
+        .tab-warning strong {
+            color: #fde68a;
+        }
         .card {
             background: #1a1a2e;
             border-radius: 16px;
@@ -75,7 +92,8 @@
         }
         input[type="text"],
         input[type="datetime-local"],
-        textarea {
+        textarea,
+        select {
             width: 100%;
             padding: 12px 14px;
             background: #0f0f23;
@@ -88,7 +106,8 @@
             font-family: inherit;
         }
         input:focus,
-        textarea:focus {
+        textarea:focus,
+        select:focus {
             border-color: #6366f1;
         }
         input[type="datetime-local"]::-webkit-calendar-picker-indicator {
@@ -98,6 +117,9 @@
         textarea {
             resize: vertical;
             min-height: 80px;
+        }
+        select {
+            cursor: pointer;
         }
         .quick-buttons {
             display: flex;
@@ -298,32 +320,33 @@
             background: #1a2e1a;
             color: #4ade80;
         }
-        .email-info {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 16px;
-            padding: 10px 14px;
+        .sound-section {
             background: #0f0f23;
-            border-radius: 8px;
+            border-radius: 10px;
+            padding: 14px;
+            margin-top: 12px;
+            border: 1px solid #2a2a4a;
+        }
+        .sound-section label {
+            margin-bottom: 8px;
+        }
+        .sound-preview {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .sound-preview button {
+            background: #1a1a2e;
             border: 1px solid #333;
-            font-size: 0.85rem;
             color: #888;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
         }
-        .email-info .icon {
-            font-size: 1.1rem;
-        }
-        .debug-box {
-            background: #1a1a1a;
-            border: 1px solid #444;
-            border-radius: 8px;
-            padding: 10px;
-            margin-top: 10px;
-            font-size: 0.75rem;
-            color: #666;
-            font-family: monospace;
-            max-height: 100px;
-            overflow-y: auto;
+        .sound-preview button:hover {
+            border-color: #6366f1;
+            color: #fff;
         }
     </style>
 <base target="_blank">
@@ -331,13 +354,12 @@
 <body>
     <div class="container">
         <h1>⏰ Reminder</h1>
-        <p class="subtitle">Set a reminder. Get an email + browser alert instantly.</p>
+        <p class="subtitle">Set a reminder. Get alerted at the exact time.</p>
 
         <div id="statusBox" class="status-box"></div>
 
-        <div class="email-info">
-            <span class="icon">📧</span>
-            <span>Emails will be sent to: <strong>thendralkaatrutv@gmail.com</strong></span>
+        <div id="tabWarning" class="tab-warning">
+            ⚠️ <strong>Keep this tab open!</strong> Reminders only fire while this tab is active in your browser. You can minimize the window — just don't close this tab.
         </div>
 
         <div id="permBanner" class="notification-perm" style="display:none;">
@@ -364,16 +386,23 @@
                 </div>
             </div>
 
-            <div class="sound-toggle">
-                <input type="checkbox" id="playSound" checked>
-                <label for="playSound" style="margin:0; text-transform:none; letter-spacing:0; font-size:0.9rem; color:#888;">Play sound when reminder fires</label>
+            <div class="sound-section">
+                <label for="soundType">Reminder Sound</label>
+                <select id="soundType">
+                    <option value="beep">Classic Beep</option>
+                    <option value="chime">Gentle Chime</option>
+                    <option value="digital">Digital Alarm</option>
+                    <option value="bell">Church Bell</option>
+                    <option value="ping">Soft Ping</option>
+                    <option value="none">No Sound</option>
+                </select>
+                <div class="sound-preview">
+                    <button onclick="previewSound()">🔊 Preview</button>
+                </div>
             </div>
 
             <button class="btn btn-primary" id="setBtn" onclick="addReminder()" style="margin-top:16px;">
-                Set Reminder & Send Email
-            </button>
-            <button class="btn btn-secondary" onclick="testEmail()">
-                Test Email Only
+                Set Reminder
             </button>
         </div>
 
@@ -389,39 +418,12 @@
                 </div>
             </div>
         </div>
-
-        <div class="debug-box" id="debugBox" style="display:none;"></div>
     </div>
 
-    <!-- EmailJS SDK -->
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-
     <script>
-        // EmailJS config
-        const EMAILJS_SERVICE_ID = "service_c9jt6u2";
-        const EMAILJS_TEMPLATE_ID = "template_oj9tijw";
-        const EMAILJS_PUBLIC_KEY = "k-E8VQ9h5SiZ4VJUO";
-        const USER_EMAIL = "thendralkaatrutv@gmail.com";
-
         let reminders = JSON.parse(localStorage.getItem('reminders') || '[]');
+        let scheduledTimeouts = {};
         let audioCtx = null;
-        let emailjsReady = false;
-
-        // Initialize EmailJS
-        try {
-            emailjs.init(EMAILJS_PUBLIC_KEY);
-            emailjsReady = true;
-            logDebug("EmailJS initialized successfully");
-        } catch (e) {
-            logDebug("EmailJS init failed: " + e.message);
-        }
-
-        function logDebug(msg) {
-            console.log(msg);
-            const box = document.getElementById('debugBox');
-            box.style.display = 'block';
-            box.textContent += msg + "\n";
-        }
 
         // Check notification permission on load
         if ('Notification' in window && Notification.permission === 'default') {
@@ -443,21 +445,102 @@
             });
         }
 
-        function playBeep() {
-            if (!document.getElementById('playSound').checked) return;
-            try {
-                if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
-                osc.connect(gain);
-                gain.connect(audioCtx.destination);
-                osc.frequency.value = 880;
-                osc.type = 'sine';
-                gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
-                osc.start(audioCtx.currentTime);
-                osc.stop(audioCtx.currentTime + 0.5);
-            } catch (e) {}
+        function getSoundType() {
+            return document.getElementById('soundType').value;
+        }
+
+        function playSound(soundType) {
+            if (soundType === 'none') return;
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            switch(soundType) {
+                case 'beep':
+                    osc.frequency.value = 880;
+                    osc.type = 'sine';
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.5);
+                    osc.start(now);
+                    osc.stop(now + 0.5);
+                    break;
+
+                case 'chime':
+                    osc.frequency.value = 523;
+                    osc.type = 'sine';
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 1.5);
+                    osc.start(now);
+                    osc.stop(now + 1.5);
+                    // Add a second tone for chime effect
+                    setTimeout(() => {
+                        const osc2 = audioCtx.createOscillator();
+                        const gain2 = audioCtx.createGain();
+                        osc2.connect(gain2);
+                        gain2.connect(audioCtx.destination);
+                        osc2.frequency.value = 659;
+                        osc2.type = 'sine';
+                        gain2.gain.setValueAtTime(0.2, audioCtx.currentTime);
+                        gain2.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 1.5);
+                        osc2.start(audioCtx.currentTime);
+                        osc2.stop(audioCtx.currentTime + 1.5);
+                    }, 200);
+                    break;
+
+                case 'digital':
+                    osc.frequency.value = 1200;
+                    osc.type = 'square';
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                    // Second beep
+                    setTimeout(() => {
+                        const osc2 = audioCtx.createOscillator();
+                        const gain2 = audioCtx.createGain();
+                        osc2.connect(gain2);
+                        gain2.connect(audioCtx.destination);
+                        osc2.frequency.value = 1200;
+                        osc2.type = 'square';
+                        gain2.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                        gain2.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                        osc2.start(audioCtx.currentTime);
+                        osc2.stop(audioCtx.currentTime + 0.3);
+                    }, 350);
+                    break;
+
+                case 'bell':
+                    osc.frequency.value = 440;
+                    osc.type = 'triangle';
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 2);
+                    osc.start(now);
+                    osc.stop(now + 2);
+                    break;
+
+                case 'ping':
+                    osc.frequency.value = 1760;
+                    osc.type = 'sine';
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.4);
+                    osc.start(now);
+                    osc.stop(now + 0.4);
+                    break;
+            }
+        }
+
+        function previewSound() {
+            const sound = getSoundType();
+            if (sound === 'none') {
+                showStatus("Sound is set to 'No Sound'", true);
+                return;
+            }
+            playSound(sound);
+            showStatus("Playing: " + document.getElementById('soundType').options[document.getElementById('soundType').selectedIndex].text);
         }
 
         function initDatetimeInput() {
@@ -483,39 +566,30 @@
             const box = document.getElementById('statusBox');
             box.textContent = msg;
             box.className = 'status-box show' + (isError ? ' error' : '');
-            setTimeout(() => box.classList.remove('show'), 8000);
+            setTimeout(() => box.classList.remove('show'), 5000);
         }
 
-        async function testEmail() {
-            if (!emailjsReady) {
-                showStatus("EmailJS not loaded. Check console.", true);
-                return;
-            }
-            const btn = document.getElementById('setBtn');
-            btn.disabled = true;
-            showStatus("Sending test email...");
-            logDebug("Sending test email...");
+        function scheduleReminderTimeout(reminder) {
+            const delay = reminder.fireAt - Date.now();
+            if (delay <= 0) return;
 
-            try {
-                const result = await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-                    email: USER_EMAIL,
-                    message: "TEST REMINDER - This is a test",
-                    datetime: new Date().toLocaleString(),
-                    created_at: new Date().toLocaleString()
-                });
-                logDebug("Test email sent! Status: " + result.status);
-                showStatus("Test email sent! Check your inbox (and spam folder).");
-            } catch (e) {
-                logDebug("Test email FAILED: " + JSON.stringify(e));
-                showStatus("Test email failed: " + (e.text || e.message || JSON.stringify(e)), true);
-            } finally {
-                btn.disabled = false;
-            }
+            const handle = setTimeout(() => {
+                showToast(reminder.message);
+                playSound(reminder.soundType || 'beep');
+
+                const r = reminders.find(x => x.id === reminder.id);
+                if (r) r.fired = true;
+                saveReminders();
+                renderReminders();
+            }, delay);
+
+            scheduledTimeouts[reminder.id] = handle;
         }
 
-        async function addReminder() {
+        function addReminder() {
             const msg = document.getElementById('message').value.trim();
             const datetimeVal = document.getElementById('datetime').value;
+            const sound = getSoundType();
 
             if (!msg) {
                 showStatus("Please enter a reminder message", true);
@@ -534,64 +608,44 @@
                 return;
             }
 
-            const btn = document.getElementById('setBtn');
-            btn.disabled = true;
-            btn.textContent = "Sending email...";
-            logDebug("Adding reminder: " + msg);
-
-            // Send email via EmailJS
-            if (emailjsReady) {
-                try {
-                    const fireDate = new Date(fireAt);
-                    const dateStr = fireDate.toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-                    const timeStr = fireDate.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
-                    const createdStr = new Date().toLocaleString();
-
-                    logDebug("Calling emailjs.send...");
-                    const result = await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-                        email: USER_EMAIL,
-                        message: msg,
-                        datetime: dateStr + " at " + timeStr,
-                        created_at: createdStr
-                    });
-                    logDebug("Email sent! Status: " + result.status);
-                    showStatus("Email sent! Check your inbox (and spam folder).");
-                } catch (e) {
-                    logDebug("Email FAILED: " + JSON.stringify(e));
-                    showStatus("Email failed: " + (e.text || e.message || "Unknown error"), true);
-                    // Continue saving reminder even if email fails
-                }
-            } else {
-                logDebug("EmailJS not ready, skipping email");
-                showStatus("EmailJS not loaded. Reminder saved locally only.", true);
-            }
-
-            // Save reminder locally
             const reminder = {
                 id: Date.now(),
                 message: msg,
                 fireAt: fireAt,
                 createdAt: now,
-                emailed: emailjsReady
+                fired: false,
+                soundType: sound
             };
 
             reminders.push(reminder);
             saveReminders();
-            renderReminders();
-            logDebug("Reminder saved. Total: " + reminders.length);
+            scheduleReminderTimeout(reminder);
 
-            // Clear form
+            document.getElementById('tabWarning').classList.add('show');
+
+            const fireDate = new Date(fireAt);
+            const dateStr = fireDate.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+            const timeStr = fireDate.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+            const soundLabel = document.getElementById('soundType').options[document.getElementById('soundType').selectedIndex].text;
+            showStatus(`Reminder set for ${dateStr} at ${timeStr}. Sound: ${soundLabel}. Keep this tab open.`);
+
             document.getElementById('message').value = '';
             initDatetimeInput();
-
-            btn.disabled = false;
-            btn.textContent = "Set Reminder & Send Email";
+            renderReminders();
         }
 
         function removeReminder(id) {
+            if (scheduledTimeouts[id]) {
+                clearTimeout(scheduledTimeouts[id]);
+                delete scheduledTimeouts[id];
+            }
             reminders = reminders.filter(r => r.id !== id);
             saveReminders();
             renderReminders();
+
+            if (!reminders.some(r => r.fireAt > Date.now() && !r.fired)) {
+                document.getElementById('tabWarning').classList.remove('show');
+            }
         }
 
         function saveReminders() {
@@ -625,7 +679,6 @@
                 <div class="toast-msg">${escapeHtml(message)}</div>
             `;
             document.body.appendChild(toast);
-            playBeep();
 
             if ('Notification' in window && Notification.permission === 'granted') {
                 new Notification('Reminder', {
@@ -637,7 +690,7 @@
             setTimeout(() => {
                 toast.style.animation = 'toastIn 0.4s ease reverse';
                 setTimeout(() => toast.remove(), 400);
-            }, 8000);
+            }, 10000);
         }
 
         function escapeHtml(text) {
@@ -650,16 +703,14 @@
             const list = document.getElementById('remindersList');
             const now = Date.now();
             reminders.sort((a, b) => a.fireAt - b.fireAt);
-            const active = reminders.filter(r => r.fireAt > now);
-            const fired = reminders.filter(r => r.fireAt <= now);
 
-            fired.forEach(r => {
-                showToast(r.message);
-            });
+            const fired = reminders.filter(r => r.fireAt <= now && r.fired);
             if (fired.length > 0) {
-                reminders = active;
+                reminders = reminders.filter(r => !(r.fireAt <= now && r.fired));
                 saveReminders();
             }
+
+            const active = reminders.filter(r => r.fireAt > now || !r.fired);
 
             if (active.length === 0) {
                 list.innerHTML = `
@@ -671,6 +722,7 @@
                         <p>No active reminders</p>
                     </div>
                 `;
+                document.getElementById('tabWarning').classList.remove('show');
                 return;
             }
 
@@ -679,12 +731,15 @@
                 const fireDate = new Date(r.fireAt);
                 const dateStr = fireDate.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
                 const timeStr = fireDate.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
-                const emailBadge = r.emailed ? '<span style="color:#4ade80; font-size:0.75rem;">✓ Emailed</span>' : '';
+                const soundLabel = r.soundType === 'none' ? '🔇' : '🔊';
+                const badge = r.fired
+                    ? '<span class="status-badge status-now">✓ FIRED</span>'
+                    : getStatusBadge(timeLeft);
                 return `
                     <div class="reminder-item">
                         <div class="reminder-info">
-                            <div class="reminder-msg">${escapeHtml(r.message)} ${getStatusBadge(timeLeft)}</div>
-                            <div class="reminder-time">${dateStr} at ${timeStr} ${emailBadge}</div>
+                            <div class="reminder-msg">${escapeHtml(r.message)} ${badge}</div>
+                            <div class="reminder-time">${dateStr} at ${timeStr} ${soundLabel}</div>
                             <div class="reminder-countdown" data-fire="${r.fireAt}">${formatTimeLeft(timeLeft)}</div>
                         </div>
                         <button class="btn btn-danger" onclick="removeReminder(${r.id})">Cancel</button>
@@ -693,26 +748,45 @@
             }).join('');
         }
 
+        function restoreScheduledTimeouts() {
+            const now = Date.now();
+            reminders.forEach(r => {
+                if (r.fireAt > now && !r.fired) {
+                    scheduleReminderTimeout(r);
+                }
+            });
+            if (reminders.some(r => r.fireAt > now && !r.fired)) {
+                document.getElementById('tabWarning').classList.add('show');
+            }
+        }
+
+        // Update countdowns every second
         setInterval(() => {
             const now = Date.now();
             document.querySelectorAll('.reminder-countdown').forEach(el => {
                 const fireAt = parseInt(el.dataset.fire);
-                const left = fireAt - now;
-                el.textContent = formatTimeLeft(left);
+                el.textContent = formatTimeLeft(fireAt - now);
             });
-
-            const fired = reminders.filter(r => r.fireAt <= now);
-            if (fired.length > 0) {
-                renderReminders();
-            }
         }, 1000);
 
+        // Warn before closing tab with active reminders
+        window.addEventListener('beforeunload', e => {
+            const hasActive = reminders.some(r => r.fireAt > Date.now() && !r.fired);
+            if (hasActive) {
+                e.preventDefault();
+                e.returnValue = 'You have pending reminders. Closing this tab will cancel them!';
+                return e.returnValue;
+            }
+        });
+
+        // Re-render when tab becomes visible
         document.addEventListener('visibilitychange', () => {
             if (!document.hidden) renderReminders();
         });
 
+        // Boot
+        restoreScheduledTimeouts();
         renderReminders();
-        logDebug("App loaded. Reminders: " + reminders.length);
     </script>
 </body>
 </html>
